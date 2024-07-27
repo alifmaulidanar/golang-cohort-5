@@ -3,7 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	for i := 1; i <= 15; i++ { // looping nilai i <= 15
+	n := 15                   // deklarasi variable n
+	for i := 1; i <= n; i++ { // looping nilai i <= n
 		switch {
 		case i%3 == 0 && i%5 == 0: // kondisi kelipatan 3 dan 5
 			fmt.Println("FizzBuzz")

@@ -22,3 +22,6 @@ CREATE TABLE variants (
 SHOW TABLES;
 SELECT * FROM products;
 SELECT * FROM variants;
+
+DROP TABLE variants;
+DROP TABLE products;

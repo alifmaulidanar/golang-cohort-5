@@ -1,0 +1,632 @@
+{
+    "collection": {
+      "info": {
+        "_postman_id": "8b484bc6-8687-4a0a-9961-316e2c151b7a",
+        "name": "Final Project",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "updatedAt": "2023-08-17T11:34:49.000Z",
+        "uid": "7183159-8b484bc6-8687-4a0a-9961-316e2c151b7a"
+      },
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Register",
+              "id": "f7ec1e69-4867-4159-9f00-542547afdd69",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "email",
+                      "value": "fitri@mail.com",
+                      "type": "text"
+                    },
+                    {
+                      "key": "name",
+                      "value": "Fitri Ayu",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "12345678",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/auth/register",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-f7ec1e69-4867-4159-9f00-542547afdd69"
+            },
+            {
+              "name": "Login",
+              "id": "ec9b23d6-f35e-4e8c-b6fe-7a4603223370",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "email",
+                      "value": "fitri@mail.com",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "12345678",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/auth/login",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-ec9b23d6-f35e-4e8c-b6fe-7a4603223370"
+            }
+          ],
+          "id": "2c617682-f5ec-4c36-9c43-c9f4ad256531",
+          "uid": "7183159-2c617682-f5ec-4c36-9c43-c9f4ad256531"
+        },
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "Variants",
+              "item": [
+                {
+                  "name": "Get All",
+                  "id": "abda5db9-05eb-452c-a1da-8ea98d849097",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      
+                    ],
+                    "url": {
+                      "raw": "https://go-product-variant-production.up.railway.app/products/variant",
+                      "protocol": "https",
+                      "host": [
+                        "go-product-variant-production",
+                        "up",
+                        "railway",
+                        "app"
+                      ],
+                      "path": [
+                        "products",
+                        "variant"
+                      ]
+                    }
+                  },
+                  "response": [
+                    
+                  ],
+                  "uid": "7183159-abda5db9-05eb-452c-a1da-8ea98d849097"
+                },
+                {
+                  "name": "Get by UUID",
+                  "id": "1db489b7-cc97-42d4-ad1e-539cff643036",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      
+                    ],
+                    "url": {
+                      "raw": "https://go-product-variant-production.up.railway.app/products/variant/:uuid",
+                      "protocol": "https",
+                      "host": [
+                        "go-product-variant-production",
+                        "up",
+                        "railway",
+                        "app"
+                      ],
+                      "path": [
+                        "products",
+                        "variant",
+                        ":uuid"
+                      ],
+                      "variable": [
+                        {
+                          "id": "690fc0b4-41ce-46ab-b42d-7e1fd5ac96e9",
+                          "key": "uuid",
+                          "value": null,
+                          "description": "uuid of variant"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    
+                  ],
+                  "uid": "7183159-1db489b7-cc97-42d4-ad1e-539cff643036"
+                },
+                {
+                  "name": "Create",
+                  "id": "a316ea2f-9189-4b33-9582-5a2b9c54462c",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbmppQG1haWwuY29tIiwiZXhwIjoiMjAyMy0wOC0xN1QxODowNTozNi4yNjA1MDYrMDc6MDAiLCJpZCI6MX0.LgEZWic9NUP72k6I61xn1WqXEFU4PPT0pdWM1hYNfnU",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "variant_name",
+                          "value": "Macbook Air M1",
+                          "type": "text"
+                        },
+                        {
+                          "key": "quantity",
+                          "type": "text",
+                          "value": "100"
+                        },
+                        {
+                          "key": "product_id",
+                          "value": "2d5cb9a9-b40f-4846-b34e-511890c1b253",
+                          "description": "uuid of product",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "https://go-product-variant-production.up.railway.app/products/variants",
+                      "protocol": "https",
+                      "host": [
+                        "go-product-variant-production",
+                        "up",
+                        "railway",
+                        "app"
+                      ],
+                      "path": [
+                        "products",
+                        "variants"
+                      ]
+                    }
+                  },
+                  "response": [
+                    
+                  ],
+                  "uid": "7183159-a316ea2f-9189-4b33-9582-5a2b9c54462c"
+                },
+                {
+                  "name": "Update",
+                  "id": "b3f9689f-a4bf-478a-bc02-4a9a2162f8e2",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbmppQG1haWwuY29tIiwiZXhwIjoiMjAyMy0wOC0xN1QxODoyMDoyOS41MDI2MDQrMDc6MDAiLCJpZCI6MX0.Xe0d8H2Fr9nMp5_NwzHNGljK-nZyjWI0vwI_D1e0kbE",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [
+                      
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "variant_name",
+                          "value": "Tes Judul",
+                          "type": "text",
+                          "description": "string"
+                        },
+                        {
+                          "key": "quantity",
+                          "value": "8",
+                          "type": "text",
+                          "description": "integer"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "https://go-product-variant-production.up.railway.app/products/variants/:uuid",
+                      "protocol": "https",
+                      "host": [
+                        "go-product-variant-production",
+                        "up",
+                        "railway",
+                        "app"
+                      ],
+                      "path": [
+                        "products",
+                        "variants",
+                        ":uuid"
+                      ],
+                      "variable": [
+                        {
+                          "id": "90b03eb6-7295-4400-a026-dc105d14ebdc",
+                          "key": "uuid",
+                          "value": "eca7ba50-504d-4a7f-b583-ca9b0f0d3d80",
+                          "description": "uuid of variant"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    
+                  ],
+                  "uid": "7183159-b3f9689f-a4bf-478a-bc02-4a9a2162f8e2"
+                },
+                {
+                  "name": "Delete",
+                  "id": "09e67e18-7dec-4105-9b39-b7464511441a",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbmppQG1haWwuY29tIiwiZXhwIjoiMjAyMy0wOC0xN1QxODoyMzo0My40MzI4MSswNzowMCIsImlkIjoxfQ.yQh8tJqeeLKNyT2sfjAc2yR-WBCv6hva9iCIlTVZhgQ",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      
+                    ],
+                    "url": {
+                      "raw": "https://go-product-variant-production.up.railway.app/products/variants/:uuid",
+                      "protocol": "https",
+                      "host": [
+                        "go-product-variant-production",
+                        "up",
+                        "railway",
+                        "app"
+                      ],
+                      "path": [
+                        "products",
+                        "variants",
+                        ":uuid"
+                      ],
+                      "variable": [
+                        {
+                          "id": "9676dbd2-39e0-4d02-8560-a14b61ea130a",
+                          "key": "uuid",
+                          "value": "eca7ba50-504d-4a7f-b583-ca9b0f0d3d80",
+                          "description": "uuid of variant"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    
+                  ],
+                  "uid": "7183159-09e67e18-7dec-4105-9b39-b7464511441a"
+                }
+              ],
+              "id": "02ba64e9-c10c-4922-baa3-7e3378054597",
+              "uid": "7183159-02ba64e9-c10c-4922-baa3-7e3378054597"
+            },
+            {
+              "name": "Get All",
+              "id": "3f61e92b-fae9-40be-9be5-c03af0627435",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  
+                ],
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/products?limit=1&offset=0",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "1"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    },
+                    {
+                      "key": "search",
+                      "value": "tes",
+                      "description": "search by name",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-3f61e92b-fae9-40be-9be5-c03af0627435"
+            },
+            {
+              "name": "Get by UUID",
+              "id": "b84d1227-8585-4ba8-8ead-307621dcc4bb",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  
+                ],
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/products/:uuid",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "products",
+                    ":uuid"
+                  ],
+                  "variable": [
+                    {
+                      "id": "74ede625-9b4e-484b-89c9-1bf49a273875",
+                      "key": "uuid",
+                      "value": "2d5cb9a9-b40f-4846-b34e-511890c1b253"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-b84d1227-8585-4ba8-8ead-307621dcc4bb"
+            },
+            {
+              "name": "Create",
+              "id": "39693176-a612-4b7c-872c-e184e4970522",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZpdHJpQG1haWwuY29tIiwiZXhwIjoiMjAyMy0wOC0xN1QxMzoyNDo1Ny43NDU2ODk3NTdaIiwiaWQiOjF9.ABTMecrVkm0kRNrc6yqoVmQP3Kmt1QW2dImC4qlPJt0",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Tes Product Minji",
+                      "type": "text"
+                    },
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "/Users/fiyuang/Downloads/Screen Shot 2023-07-07 at 11.56.11.png"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/products",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-39693176-a612-4b7c-872c-e184e4970522"
+            },
+            {
+              "name": "Update",
+              "id": "58e65210-17cb-4c78-bf92-e31d9dcad5e7",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbmppQG1haWwuY29tIiwiZXhwIjoiMjAyMy0wOC0xN1QxNToyMTozMS4wNTYyMTYrMDc6MDAiLCJpZCI6MX0.UImSF82fcca7fLPXqw5y6Hzn1AYw8z0WWisvFkzUkOA",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Tes Nama Update",
+                      "type": "text"
+                    },
+                    {
+                      "key": "file",
+                      "value": "",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/products/:uuid",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "products",
+                    ":uuid"
+                  ],
+                  "variable": [
+                    {
+                      "id": "31407092-51f6-4149-b585-e992efb592d2",
+                      "key": "uuid",
+                      "value": "2d5cb9a9-b40f-4846-b34e-511890c1b253"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-58e65210-17cb-4c78-bf92-e31d9dcad5e7"
+            },
+            {
+              "name": "Delete",
+              "id": "c10fcaff-fc8f-4b33-b209-5bd141f74ef9",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbmppQG1haWwuY29tIiwiZXhwIjoiMjAyMy0wOC0xN1QxNTo0MDoxOS4zMTY0MjcrMDc6MDAiLCJpZCI6MX0.x3NXMQsmx4eIae7CIshxkG10jVvi2GSSNDYW-V5e7rg",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  
+                ],
+                "url": {
+                  "raw": "https://go-product-variant-production.up.railway.app/products/:uuid",
+                  "protocol": "https",
+                  "host": [
+                    "go-product-variant-production",
+                    "up",
+                    "railway",
+                    "app"
+                  ],
+                  "path": [
+                    "products",
+                    ":uuid"
+                  ],
+                  "variable": [
+                    {
+                      "id": "408a6e71-c495-424e-9a7a-f799243a90eb",
+                      "key": "uuid",
+                      "value": "92cf74a3-705e-49c3-8665-ffcf73aac8fv"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                
+              ],
+              "uid": "7183159-c10fcaff-fc8f-4b33-b209-5bd141f74ef9"
+            }
+          ],
+          "id": "dafa8c78-d81a-4602-a516-62cf51731c2d",
+          "uid": "7183159-dafa8c78-d81a-4602-a516-62cf51731c2d"
+        }
+      ]
+    }
+  }

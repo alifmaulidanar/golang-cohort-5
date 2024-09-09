@@ -13,7 +13,7 @@ func InsertAdmin(db *sql.DB, admin domain.Admin) error {
 
 func FindAdminByEmail(db *sql.DB, email string) (domain.Admin, error) {
 	var admin domain.Admin
-	query := "SELECT id, uuid, name, email, password FROM admins WHERE email = ?"
+	query := "SELECT * FROM admins WHERE email = ?"
 	err := db.QueryRow(query, email).Scan(&admin.ID, &admin.UUID, &admin.Name, &admin.Email, &admin.Password)
 	return admin, err
 }

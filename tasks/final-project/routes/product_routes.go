@@ -1,0 +1,289 @@
+package routes
+
+import (
+	"database/sql"
+	"net/http"
+	"path/filepath"
+	"strconv"
+
+	"final-project/config"
+	"final-project/domain"
+	"final-project/middleware"
+	"final-project/repository"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
+
+func ProductRoutes(r *gin.Engine, db *sql.DB) {
+	// Get all products with pagination
+	r.GET("/products", func(c *gin.Context) {
+		limitStr := c.DefaultQuery("limit", "10")  // Default limit is 10 if not specified
+		offsetStr := c.DefaultQuery("offset", "0") // Default offset is 0 if not specified
+		search := c.DefaultQuery("search", "")     // Default search is empty if not specified
+
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil || limit <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit parameter"})
+			return
+		}
+
+		offset, err := strconv.Atoi(offsetStr)
+		if err != nil || offset < 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset parameter"})
+			return
+		}
+
+		products, err := repository.GetAllProducts(db, limit, offset, search)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get products"})
+			return
+		}
+
+		c.JSON(http.StatusOK, products)
+	})
+
+	// Get a product by UUID
+	r.GET("/products/:uuid", func(c *gin.Context) {
+		uuid := c.Param("uuid") // Get the UUID from path parameter
+
+		// Check if UUID is provided
+		if uuid == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "UUID is required"})
+			return
+		}
+
+		// Call the repository function to get the product by UUID
+		product, err := repository.GetProductByUUID(db, uuid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get product"})
+			return
+		}
+
+		// Check if the product was not found
+		if product.UUID == "" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, product)
+	})
+
+	// Gunakan middleware untuk endpoint yang membutuhkan otorisasi
+	protected := r.Group("/")
+	protected.Use(middleware.AuthMiddleware())
+
+	// POST route to create a new product
+	protected.POST("/products", func(c *gin.Context) {
+		// Initialize Cloudinary client
+		cld, err := config.InitializeCloudinary()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to initialize Cloudinary"})
+			return
+		}
+
+		// Get the product name from the form-data
+		name := c.PostForm("name")
+		if name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Product name is required"})
+			return
+		}
+
+		// Get the file from the form-data
+		file, err := c.FormFile("file")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "File is required"})
+			return
+		}
+
+		// Validate file type and size
+		allowedExtensions := map[string]bool{
+			".jpg":  true,
+			".jpeg": true,
+			".png":  true,
+			".svg":  true,
+		}
+		ext := filepath.Ext(file.Filename)
+		if !allowedExtensions[ext] {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file type. Only JPG, JPEG, PNG, and SVG are allowed."})
+			return
+		}
+
+		if file.Size > 5*1024*1024 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "File size exceeds 5 MB"})
+			return
+		}
+
+		// Save the file locally temporarily
+		tempFilePath := "./" + file.Filename
+		if err := c.SaveUploadedFile(file, tempFilePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file locally"})
+			return
+		}
+
+		// Upload the image to Cloudinary
+		uploadResult, err := config.UploadImage(cld, tempFilePath, "products")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image to Cloudinary"})
+			return
+		}
+
+		// Generate a new UUID for the product
+		productUUID := uuid.New().String()
+
+		// Extract admin_id from JWT
+		adminID := c.MustGet("admin_id").(int)
+
+		// Create a new product
+		product := domain.Product{
+			UUID:     productUUID,
+			Name:     name,
+			ImageURL: uploadResult.SecureURL,
+			AdminID:  adminID,
+		}
+
+		// Insert the product into the database and get the complete data
+		err = repository.InsertProduct(db, &product)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Product created successfully", "product": product})
+	})
+
+	// Update route for a product
+	protected.PUT("/products/:uuid", func(c *gin.Context) {
+		// Get the product UUID from the URL parameter
+		productUUID := c.Param("uuid")
+		if productUUID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Product UUID is required"})
+			return
+		}
+
+		// Extract admin_id from JWT for authorization
+		adminID := c.MustGet("admin_id").(int)
+
+		// Get the existing product from the database
+		existingProduct, err := repository.GetProductByUUID(db, productUUID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve product"})
+			return
+		}
+
+		// Check if the product exists and the user is the owner
+		if existingProduct.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+			return
+		}
+		if existingProduct.AdminID != adminID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this product"})
+			return
+		}
+
+		// Get the updated product name and file from the form-data
+		name := c.PostForm("name")
+		file, _ := c.FormFile("file")
+
+		// Ensure that at least one field (name or file) is provided
+		if name == "" && file == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Either product name or file must be provided"})
+			return
+		}
+
+		// Prepare the updated product struct
+		updatedProduct := existingProduct
+		if name != "" {
+			updatedProduct.Name = name
+		}
+
+		if file != nil {
+			// Validate file type and size
+			allowedExtensions := map[string]bool{
+				".jpg":  true,
+				".jpeg": true,
+				".png":  true,
+				".svg":  true,
+			}
+			ext := filepath.Ext(file.Filename)
+			if !allowedExtensions[ext] {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file type. Only JPG, JPEG, PNG, and SVG are allowed."})
+				return
+			}
+
+			if file.Size > 5*1024*1024 {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "File size exceeds 5 MB"})
+				return
+			}
+
+			// Save the file locally temporarily
+			tempFilePath := "./" + file.Filename
+			if err := c.SaveUploadedFile(file, tempFilePath); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file locally"})
+				return
+			}
+
+			// Upload the image to Cloudinary
+			cld, err := config.InitializeCloudinary()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to initialize Cloudinary"})
+				return
+			}
+			uploadResult, err := config.UploadImage(cld, tempFilePath, "products")
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image to Cloudinary"})
+				return
+			}
+
+			updatedProduct.ImageURL = uploadResult.SecureURL
+		}
+
+		// Update the product in the database
+		err = repository.UpdateProduct(db, productUUID, &updatedProduct)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully", "product": updatedProduct})
+	})
+
+	// Delete route for a product
+	protected.DELETE("/products/:uuid", func(c *gin.Context) {
+		// Get the product UUID from the URL parameter
+		productUUID := c.Param("uuid")
+		if productUUID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Product UUID is required"})
+			return
+		}
+
+		// Extract admin_id from JWT for authorization
+		adminID := c.MustGet("admin_id").(int)
+
+		// Get the existing product from the database
+		existingProduct, err := repository.GetProductByUUID(db, productUUID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve product"})
+			return
+		}
+
+		// Check if the product exists and the user is the owner
+		if existingProduct.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+			return
+		}
+		if existingProduct.AdminID != adminID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to delete this product"})
+			return
+		}
+
+		// Delete the product from the database
+		err = repository.DeleteProduct(db, productUUID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
+	})
+}

@@ -6,9 +6,11 @@ import (
 )
 
 // Function to get all products with pagination
-func GetAllProducts(db *sql.DB, limit int, offset int) ([]domain.Product, error) {
-	query := "SELECT id, uuid, name, image_url, admin_id, created_at, updated_at FROM products LIMIT ? OFFSET ?"
-	rows, err := db.Query(query, limit, offset)
+func GetAllProducts(db *sql.DB, limit int, offset int, search string) ([]domain.Product, error) {
+	query := "SELECT * FROM products WHERE name LIKE ? LIMIT ? OFFSET ?"
+	searchTerm := "%" + search + "%"
+
+	rows, err := db.Query(query, searchTerm, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +35,7 @@ func GetAllProducts(db *sql.DB, limit int, offset int) ([]domain.Product, error)
 // Function to get a product by UUID
 func GetProductByUUID(db *sql.DB, uuid string) (domain.Product, error) {
 	var product domain.Product
-	query := "SELECT id, uuid, name, image_url, admin_id, created_at, updated_at FROM products WHERE uuid = ?"
+	query := "SELECT * FROM products WHERE uuid = ?"
 	err := db.QueryRow(query, uuid).Scan(&product.ID, &product.UUID, &product.Name, &product.ImageURL, &product.AdminID, &product.CreatedAt, &product.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -59,6 +61,27 @@ func InsertProduct(db *sql.DB, product *domain.Product) error {
 	}
 
 	// Retrieve the complete product data from the database
-	return db.QueryRow("SELECT id, uuid, name, image_url, admin_id, created_at, updated_at FROM products WHERE id = ?", productID).
+	return db.QueryRow("SELECT * FROM products WHERE id = ?", productID).
 		Scan(&product.ID, &product.UUID, &product.Name, &product.ImageURL, &product.AdminID, &product.CreatedAt, &product.UpdatedAt)
+}
+
+// Function to update an existing product in the database
+func UpdateProduct(db *sql.DB, uuid string, product *domain.Product) error {
+	query := `UPDATE products SET name = ?, image_url = ?, updated_at = NOW() WHERE uuid = ? AND admin_id = ?`
+
+	_, err := db.Exec(query, product.Name, product.ImageURL, uuid, product.AdminID)
+	if err != nil {
+		return err
+	}
+
+	// Retrieve the updated product data from the database
+	return db.QueryRow("SELECT * FROM products WHERE uuid = ?", uuid).
+		Scan(&product.ID, &product.UUID, &product.Name, &product.ImageURL, &product.AdminID, &product.CreatedAt, &product.UpdatedAt)
+}
+
+// Function to delete a product from the database
+func DeleteProduct(db *sql.DB, uuid string) error {
+	query := "DELETE FROM products WHERE uuid = ?"
+	_, err := db.Exec(query, uuid)
+	return err
 }

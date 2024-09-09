@@ -21,7 +21,9 @@ func main() {
 	r := gin.Default()
 
 	// Setup routes
-	routes.SetupRoutes(r, db)
+	routes.AdminRoutes(r, db)
+	routes.ProductRoutes(r, db)
+	routes.VariantRoutes(r, db)
 
 	// Run the Gin server
 	if err := r.Run(":8080"); err != nil {

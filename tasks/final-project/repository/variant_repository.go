@@ -7,7 +7,7 @@ import (
 
 // Function to get all variants with pagination
 func GetAllVariants(db *sql.DB, limit int, offset int, search string) ([]domain.Variant, error) {
-	query := "SELECT * FROM variants WHERE variant_name LIKE ? LIMIT ? OFFSET ?"
+	query := "SELECT id, uuid, variant_name, quantity, product_id, created_at, updated_at FROM variants WHERE variant_name LIKE ? LIMIT ? OFFSET ?"
 	searchTerm := "%" + search + "%"
 
 	rows, err := db.Query(query, searchTerm, limit, offset)
@@ -35,7 +35,7 @@ func GetAllVariants(db *sql.DB, limit int, offset int, search string) ([]domain.
 // Function to get a variant by UUID
 func GetVariantByUUID(db *sql.DB, uuid string) (domain.Variant, error) {
 	var variant domain.Variant
-	query := "SELECT * FROM variants WHERE uuid = ?"
+	query := "SELECT id, uuid, variant_name, quantity, product_id, created_at, updated_at FROM variants WHERE uuid = ?"
 	err := db.QueryRow(query, uuid).Scan(&variant.ID, &variant.UUID, &variant.VariantName, &variant.Quantity, &variant.ProductID, &variant.CreatedAt, &variant.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -61,7 +61,7 @@ func InsertVariant(db *sql.DB, variant *domain.Variant) error {
 	}
 
 	// Retrieve the complete variant data from the database
-	return db.QueryRow("SELECT * FROM variants WHERE id = ?", variantID).
+	return db.QueryRow("SELECT id, uuid, variant_name, quantity, product_id, created_at, updated_at FROM variants WHERE id = ?", variantID).
 		Scan(&variant.ID, &variant.UUID, &variant.VariantName, &variant.Quantity, &variant.ProductID, &variant.CreatedAt, &variant.UpdatedAt)
 }
 
@@ -75,7 +75,7 @@ func UpdateVariant(db *sql.DB, uuid string, variant *domain.Variant) error {
 	}
 
 	// Retrieve the updated variant data from the database
-	return db.QueryRow("SELECT * FROM variants WHERE uuid = ?", uuid).
+	return db.QueryRow("SELECT id, uuid, variant_name, quantity, product_id, created_at, updated_at FROM variants WHERE uuid = ?", uuid).
 		Scan(&variant.ID, &variant.UUID, &variant.VariantName, &variant.Quantity, &variant.ProductID, &variant.CreatedAt, &variant.UpdatedAt)
 }
 

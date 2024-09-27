@@ -40,6 +40,12 @@ SELECT * FROM admins;
 SELECT * FROM products;
 SELECT * FROM variants;
 
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE variants;
+TRUNCATE TABLE products;
+TRUNCATE TABLE admins;
+SET FOREIGN_KEY_CHECKS = 1;
+
 DROP TABLE admins;
 DROP TABLE products;
 DROP TABLE variants;

@@ -3,13 +3,15 @@ package service
 import (
 	"final-project/domain"
 	"os"
+	"regexp"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// GenerateJWT generates a JWT token for a valid admin
+// GenerateJWT generates a JWT token for the admin
 func GenerateJWT(admin domain.Admin) (string, error) {
 	jwtSecretKey := os.Getenv("JWT_SECRET")
 	claims := jwt.MapClaims{
@@ -21,7 +23,7 @@ func GenerateJWT(admin domain.Admin) (string, error) {
 	return token.SignedString([]byte(jwtSecretKey))
 }
 
-// HashPassword hashes a password using bcrypt
+// HashPassword hashes a password using bcrypt/crypto
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -31,4 +33,20 @@ func HashPassword(password string) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+// Custom password validator
+func PasswordValidator(fl validator.FieldLevel) bool {
+	password := fl.Field().String()
+
+	// Min. 8 characters long
+	if len(password) < 8 {
+		return false
+	}
+
+	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)                         // Min. 1 lowercase letter
+	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)                         // Min. 1 uppercase letter
+	hasSpecial := regexp.MustCompile(`[!@#~$%^&*()_+{}":;'?/>.<,]`).MatchString(password) // Min. 1 special character
+
+	return hasLower && hasUpper && hasSpecial
 }

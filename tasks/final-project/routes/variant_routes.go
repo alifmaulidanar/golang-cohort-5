@@ -15,6 +15,7 @@ import (
 )
 
 func VariantRoutes(r *gin.Engine, db *sql.DB) {
+	// Get all variants
 	r.GET("/products/variant", func(c *gin.Context) {
 		limitStr := c.DefaultQuery("limit", "10")  // Default limit is 10 if not specified
 		offsetStr := c.DefaultQuery("offset", "0") // Default offset is 0 if not specified
@@ -48,7 +49,6 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 			return
 		}
 
-		// Call the repository function to get the product by UUID
 		product, err := repository.GetVariantByUUID(db, uuid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get product"})
@@ -61,11 +61,14 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 		c.JSON(http.StatusOK, product)
 	})
 
-	// Gunakan middleware untuk endpoint yang membutuhkan otorisasi
+	// Middleware to protect routes
 	protected := r.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 
-	// Create route for a variant
+	// Initialize validator
+	validate := validator.New()
+
+	// Create variant
 	protected.POST("/products/variants", func(c *gin.Context) {
 		adminID := c.MustGet("admin_id").(int)
 		variantName := c.PostForm("variant_name")
@@ -76,7 +79,6 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 			return
 		}
 
-		// Convert quantity to integers
 		quantity, err := strconv.Atoi(quantityStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid quantity format"})
@@ -106,12 +108,17 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 			ProductID:   existingProduct.ID,
 		}
 
-		validate := validator.New()
 		if err := validate.Struct(variant); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			validationErrors := err.(validator.ValidationErrors)
+			errors := make(map[string]string)
+			for _, fieldError := range validationErrors {
+				errors[fieldError.Field()] = fieldError.Error()
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 			return
 		}
 
+		// Insert into database
 		err = repository.InsertVariant(db, &variant)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create variant"})
@@ -120,7 +127,7 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 		c.JSON(http.StatusOK, gin.H{"message": "Variant created successfully", "variant": variant})
 	})
 
-	// Update route for a variant
+	// Update variant
 	protected.PUT("/products/variants/:uuid", func(c *gin.Context) {
 		variantUUID := c.Param("uuid")
 		if variantUUID == "" {
@@ -174,6 +181,18 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 			return
 		}
 
+		validate := validator.New()
+		if err := validate.Struct(updatedVariant); err != nil {
+			validationErrors := err.(validator.ValidationErrors)
+			errors := make(map[string]string)
+			for _, fieldError := range validationErrors {
+				errors[fieldError.Field()] = fieldError.Error()
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+			return
+		}
+
+		// Update the variant in the database
 		err = repository.UpdateVariant(db, variantUUID, &updatedVariant)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update variant"})
@@ -182,7 +201,7 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 		c.JSON(http.StatusOK, gin.H{"message": "Variant updated successfully", "variant": updatedVariant})
 	})
 
-	// Delete route for a variant
+	// Delete variant
 	protected.DELETE("/products/variants/:uuid", func(c *gin.Context) {
 		variantUUID := c.Param("uuid")
 		if variantUUID == "" {
@@ -211,6 +230,7 @@ func VariantRoutes(r *gin.Engine, db *sql.DB) {
 			return
 		}
 
+		// Delete the variant from the database
 		err = repository.DeleteVariant(db, variantUUID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete variant"})

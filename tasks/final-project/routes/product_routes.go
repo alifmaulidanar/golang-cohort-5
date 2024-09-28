@@ -3,6 +3,7 @@ package routes
 import (
 	"database/sql"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -12,10 +13,12 @@ import (
 	"final-project/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
 func ProductRoutes(r *gin.Engine, db *sql.DB) {
+	// Get all products
 	r.GET("/products", func(c *gin.Context) {
 		limitStr := c.DefaultQuery("limit", "10")  // Default limit is 10 if not specified
 		offsetStr := c.DefaultQuery("offset", "0") // Default offset is 0 if not specified
@@ -61,11 +64,14 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 		c.JSON(http.StatusOK, product)
 	})
 
-	// Gunakan middleware untuk endpoint yang membutuhkan otorisasi
+	// Middleware to protect routes
 	protected := r.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 
-	// POST route to create a new product
+	// Initialize validator
+	validate := validator.New()
+
+	// Create product
 	protected.POST("/products", func(c *gin.Context) {
 		cld, err := config.InitializeCloudinary()
 		if err != nil {
@@ -101,7 +107,14 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 			return
 		}
 
-		tempFilePath := "./" + file.Filename
+		// Create the temporary file path
+		tempFilePath := "./temp/files/" + file.Filename
+		if err := os.MkdirAll(filepath.Dir(tempFilePath), 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create temp directory"})
+			return
+		}
+
+		// Save uploaded file to the temporary directory
 		if err := c.SaveUploadedFile(file, tempFilePath); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file locally"})
 			return
@@ -111,8 +124,12 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 		uploadResult, err := config.UploadImage(cld, tempFilePath, "products")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image to Cloudinary"})
+			os.Remove(tempFilePath)
 			return
 		}
+
+		// Remove the temporary file after successful upload
+		os.Remove(tempFilePath)
 
 		productUUID := uuid.New().String()
 		adminID := c.MustGet("admin_id").(int)
@@ -123,7 +140,17 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 			AdminID:  adminID,
 		}
 
-		// Insert the product into the database and get the complete data
+		if err := validate.Struct(product); err != nil {
+			validationErrors := err.(validator.ValidationErrors)
+			errors := make(map[string]string)
+			for _, fieldError := range validationErrors {
+				errors[fieldError.Field()] = fieldError.Error()
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+			return
+		}
+
+		// Insert into database
 		err = repository.InsertProduct(db, &product)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
@@ -132,7 +159,7 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 		c.JSON(http.StatusOK, gin.H{"message": "Product created successfully", "product": product})
 	})
 
-	// Update route for a product
+	// Update product
 	protected.PUT("/products/:uuid", func(c *gin.Context) {
 		productUUID := c.Param("uuid")
 		if productUUID == "" {
@@ -184,7 +211,14 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 				return
 			}
 
-			tempFilePath := "./" + file.Filename
+			// Create the temporary file path
+			tempFilePath := "./temp/files/" + file.Filename
+			if err := os.MkdirAll(filepath.Dir(tempFilePath), 0755); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create temp directory"})
+				return
+			}
+
+			// Save the uploaded file to the temporary directory
 			if err := c.SaveUploadedFile(file, tempFilePath); err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file locally"})
 				return
@@ -199,8 +233,13 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 			uploadResult, err := config.UploadImage(cld, tempFilePath, "products")
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image to Cloudinary"})
+				os.Remove(tempFilePath)
 				return
 			}
+
+			// Remove the temporary file after successful upload
+			os.Remove(tempFilePath)
+
 			updatedProduct.ImageURL = uploadResult.SecureURL
 		}
 
@@ -213,7 +252,7 @@ func ProductRoutes(r *gin.Engine, db *sql.DB) {
 		c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully", "product": updatedProduct})
 	})
 
-	// Delete route for a product
+	// Delete product
 	protected.DELETE("/products/:uuid", func(c *gin.Context) {
 		productUUID := c.Param("uuid")
 		if productUUID == "" {

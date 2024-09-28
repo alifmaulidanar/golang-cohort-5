@@ -43,3 +43,5 @@
 
 # postman
 # *.postman_collection.json
+
+*.log

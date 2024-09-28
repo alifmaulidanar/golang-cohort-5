@@ -1,0 +1,476 @@
+{
+	"info": {
+		"_postman_id": "4a10e4c3-4d74-4736-97bb-3c4c4605502e",
+		"name": "Final Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31104606"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "johndoe@example.com",
+									"description": "format email",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "John Doe",
+									"description": "min. 3 characters, max. 32 characters",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "P@ssword123",
+									"description": "min. 8 characters long, min. 1 number, min. 1 uppercase/lowercase, min. 1 unique character",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/auth/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "johndoe@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "P@ssword123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/products?limit=10&offset=0&search=",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "search by name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get by UUID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/products/:uuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "eb554526-2771-4217-bca0-b8208c2375a7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiZW1haWwiOiJhbGlmQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI3Nzg1MzU0fQ.vu7F-v6NfWSCMaxdLCBnFfhTUAO6hbKPelvo-jH8KE8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Lamborghini Gallardo",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Alif/OneDrive/Pictures/lamborghini-gallardo-yellow.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MiwiZW1haWwiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI3Nzg1NDUzfQ.nMWlJHaIT47HpOjxNpwr3uIv85DlHr9Ew6rJHbXHrbw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Nissan Serena 2024",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/products/:uuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "eb554526-2771-4217-bca0-b8208c2375a7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiZW1haWwiOiJhbGlmQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI3Nzg1MzU0fQ.vu7F-v6NfWSCMaxdLCBnFfhTUAO6hbKPelvo-jH8KE8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/products/:uuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "d975bccb-b870-45fb-b38d-b1fb59aa7232"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Variants",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/products/variant?limit=10&offset=0&search=",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								"variant"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get by UUID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/products/variant/:uuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								"variant",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "aaa8e0f0-06b9-40dc-9b0e-e9370b650c80",
+									"description": "uuid of variant"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiZW1haWwiOiJhbGlmQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI3Nzg1MzU0fQ.vu7F-v6NfWSCMaxdLCBnFfhTUAO6hbKPelvo-jH8KE8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "variant_name",
+									"value": "Super Trofeo Stradale",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "150",
+									"type": "text"
+								},
+								{
+									"key": "product_id",
+									"value": "d975bccb-b870-45fb-b38d-b1fb59aa7232",
+									"description": "uuid of product",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/products/variants",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								"variants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MywiZW1haWwiOiJhbGlmQGdtYWlsLmNvbSIsImV4cCI6MTcyNzc0OTQ0N30.p1P1NDo9j3T1Z7zMHJHCCQzhDqgZF7UsFLXf6RtNKKU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "variant_name",
+									"value": "Lenovo Thinkpad X1 Carbon",
+									"description": "string",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "65",
+									"description": "integer",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/products/variants/:uuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								"variants",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "d9d991b3-adc9-4c3c-a5c2-60a4dc30084b",
+									"description": "uuid of variant"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MiwiZW1haWwiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI3Nzg1NDUzfQ.nMWlJHaIT47HpOjxNpwr3uIv85DlHr9Ew6rJHbXHrbw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/products/variants/:uuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"products",
+								"variants",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "a60d8515-eadc-44c7-afc7-eacecddfc15d",
+									"description": "uuid of variant"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -12,7 +12,6 @@ import (
 
 // InitializeCloudinary initializes Cloudinary client
 func InitializeCloudinary() (*cloudinary.Cloudinary, error) {
-	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
@@ -23,12 +22,10 @@ func InitializeCloudinary() (*cloudinary.Cloudinary, error) {
 	apiKey := os.Getenv("CLOUDINARY_API_KEY")
 	apiSecret := os.Getenv("CLOUDINARY_API_SECRET")
 
-	// Initialize Cloudinary client
 	cld, err := cloudinary.NewFromParams(cloudName, apiKey, apiSecret)
 	if err != nil {
 		return nil, err
 	}
-
 	return cld, nil
 }
 
@@ -40,11 +37,9 @@ func UploadImage(cld *cloudinary.Cloudinary, filePath string, folder string) (*u
 		Folder: folder,
 	}
 
-	// Uploading the image file to Cloudinary
 	result, err := cld.Upload.Upload(ctx, filePath, uploadParams)
 	if err != nil {
 		return nil, err
 	}
-
 	return result, nil
 }

@@ -12,7 +12,6 @@ import (
 // GenerateJWT generates a JWT token for a valid admin
 func GenerateJWT(admin domain.Admin) (string, error) {
 	jwtSecretKey := os.Getenv("JWT_SECRET")
-
 	claims := jwt.MapClaims{
 		"admin_id": admin.ID,
 		"email":    admin.Email,

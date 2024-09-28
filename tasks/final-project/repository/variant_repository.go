@@ -28,7 +28,6 @@ func GetAllVariants(db *sql.DB, limit int, offset int, search string) ([]domain.
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return variants, nil
 }
 
@@ -39,9 +38,9 @@ func GetVariantByUUID(db *sql.DB, uuid string) (domain.Variant, error) {
 	err := db.QueryRow(query, uuid).Scan(&variant.ID, &variant.UUID, &variant.VariantName, &variant.Quantity, &variant.ProductID, &variant.CreatedAt, &variant.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return variant, nil // No rows found, return empty variant
+			return variant, nil
 		}
-		return variant, err // Return error if something goes wrong
+		return variant, err
 	}
 	return variant, nil
 }
@@ -60,21 +59,20 @@ func InsertVariant(db *sql.DB, variant *domain.Variant) error {
 		return err
 	}
 
-	// Retrieve the complete variant data from the database
 	return db.QueryRow("SELECT id, uuid, variant_name, quantity, product_id, created_at, updated_at FROM variants WHERE id = ?", variantID).
 		Scan(&variant.ID, &variant.UUID, &variant.VariantName, &variant.Quantity, &variant.ProductID, &variant.CreatedAt, &variant.UpdatedAt)
 }
 
 // Function to update an existing variant in the database
 func UpdateVariant(db *sql.DB, uuid string, variant *domain.Variant) error {
-	query := `UPDATE variants SET name = ?, image_url = ?, updated_at = NOW() WHERE uuid = ? AND admin_id = ?`
+	query := `UPDATE variants SET variant_name = ?, quantity = ?, updated_at = NOW() WHERE uuid = ? AND product_id = ?`
 
+	// Update the variant in the database
 	_, err := db.Exec(query, variant.VariantName, variant.Quantity, uuid, variant.ProductID)
 	if err != nil {
 		return err
 	}
 
-	// Retrieve the updated variant data from the database
 	return db.QueryRow("SELECT id, uuid, variant_name, quantity, product_id, created_at, updated_at FROM variants WHERE uuid = ?", uuid).
 		Scan(&variant.ID, &variant.UUID, &variant.VariantName, &variant.Quantity, &variant.ProductID, &variant.CreatedAt, &variant.UpdatedAt)
 }

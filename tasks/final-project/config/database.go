@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Initializes the MySQL database (raw SQL)
 func InitDB() (*sql.DB, error) {
 	err := godotenv.Load()
 	if err != nil {

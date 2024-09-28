@@ -23,8 +23,6 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// Extract token from header
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-		// Parse the token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// Ensure the signing method is HMAC
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -39,7 +37,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Extract claims and set admin_id in context
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			adminID := int(claims["admin_id"].(float64))
 			c.Set("admin_id", adminID)
@@ -48,8 +45,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
-		// Proceed to the next handler if the token is valid
 		c.Next()
 	}
 }
